@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="p.minn.privilege.repository.AccountDao">
+	<select id="getTotal" resultType="java.lang.Integer">
+		select count(*) from account where 1=1
+		<if test="condition.name!='unknown'">
+		  and name like '${condition.name}%'
+		</if>
+		<if test="condition.active!='unknown'">
+		  and active=${condition.active}
+		</if>
+	</select>
+	<select id="query" resultType="java.util.HashMap">
+		select id,name,type,logintype,active,department_id as departmentId, (select max(name) from
+		v_globalization_dictionary where mkey='ACCOUNTTYPE' and language=#{lang} and val=type) as
+		type_name,(select
+		max(name) from v_globalization_dictionary where mkey='LOGINTYPE' and language=#{lang} and
+		val=logintype) as
+		logintype_name,(select max(name) from
+		v_globalization_dictionary where mkey='ACTIVETYPE' and language=#{lang} and val=active) as
+		active_name,(select max(name) from
+		v_globalization_dictionary where mkey='DEPARTMENTCODE' and language=#{lang} and val=department_id) as
+		department_name
+		from
+		account where 1=1
+		<if test="condition.name!='unknown'">
+		  and name like '${condition.name}%'
+		</if>
+		<if test="condition.active!='unknown'">
+		  and active=${condition.active}
+		</if>
+		limit ${page.startR},${page.endR}
+	</select>
+	
+	<select id="getAccountRole" resultType="java.util.HashMap">
+		select r.id,g.name as text, -2 as pid
+		 <if test="condition.accountid!='unknown'">
+		 ,case when ur.account_id is null then 0 else 1 end as
+			selected
+		</if>	
+		<if test="condition.accountid=='unknown'">
+			,0 as selected
+		</if>
+		from role r inner join globalization g on g.tablename='role' and g.language=#{lang} and g.tableid=r.id 
+		 <if test="condition.accountid!='unknown'">
+		 left join (select * from account_role where
+			account_id=${condition.accountid} ) ur on r.id=ur.role_id
+		</if>
+	</select>
+	
+	<select id="getAccountRoleList" resultType="java.util.List">
+		select r.code
+		<if test="accountid!=null"> ,case when ur.role_id is null then 0 else 1 end as flag
+		</if>
+		from role r
+		<if test="accountid!=null"> left join (select * from account_role where
+			account_id=${accountid} ) ur on r.id=ur.role_id
+		</if>
+	</select>
+	
+	<select id="getAccountRoleRealmList" parameterType="int" resultType="java.lang.String">
+		select code from role 
+		<if test="accountid!=null"> where id in (select role_id from account_role where account_id=${accountid} )
+		</if>
+	</select>
+
+
+	<select id="checkAccount" resultType="Account">
+		select * from account where
+		active=1
+		and name=#{name} and pwd=#{pwd}
+	</select>
+	
+	<select id="findByLoginName" resultType="Account">
+		select * from account where
+		active=1
+		and name=#{loginName} 
+	</select>
+
+	<insert id="save" parameterType="Account" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO account (name, pwd, type,logintype,active,department_id,createid,createtime)
+		VALUES
+		(#{name}, #{pwd}, #{type},#{loginType},#{active},#{departmentId},${createid},sysdate())
+	</insert>
+
+	<update id="update" parameterType="Account">
+		UPDATE account SET
+		pwd = #{pwd},
+		name=#{name},
+		type=#{type},
+		logintype=#{loginType},
+		active=#{active},
+		department_id=#{departmentId},
+		updateid=${updateid},
+		updatetime=sysdate()
+		WHERE id = #{id}
+	</update>
+
+	<insert id="saveAccountRole">
+		insert into account_role(account_id,role_id) values
+		<foreach collection="accountRoles" item="accountRole" index="index"
+			open="(" separator="),(" close=")">
+			${accountRole.accountId},${accountRole.roleId}
+		</foreach>
+
+	</insert>
+
+
+	<delete id="delete">
+		delete from account where id=${id}
+	</delete>
+
+
+	<delete id="delAccountRole">
+		delete from account_role where
+		account_id=${accountid}
+	</delete>
+	<select id="getAccountById" resultType="Account">
+		select * from account where id=${account.id}
+	</select>
+</mapper>

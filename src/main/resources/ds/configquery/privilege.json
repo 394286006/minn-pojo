@@ -1,0 +1,40 @@
+{
+ "getConfigMenu":
+     {
+        "ds":"privilege",
+        "ns":"p.minn.privilege.repository.CommonDao",
+       "autototalsql":false,
+       "autosql":false,
+       "table":"resource",
+       "querykey":[{"resourcekey":"menu_name","id":"name"},{"resourcekey":"menu_urltype","id":"urltype","ctype":"select"},{"resourcekey":"common_active","id":"active","ctype":"select"}],
+       "wherekey":{"name":[{"val":"name"}],"urltype":[{"val":"urltype","type":"number"}],"active":[{"val":"active","type":"number"}]},
+       "gridkey":[
+       			  {"resourcekey":"common_id","column":"id","hide":true,"width":50}
+                 ,{"resourcekey":"menu_name","column":"name"}
+                 ,{"resourcekey":"menu_url","column":"url"}
+                 ,{"resourcekey":"menu_pId","column":"pNode","rcolumn":"code","mkey":"RESOURCECODE"}
+                 ,{"resourcekey":"menu_type","column":"typename","rcolumn":"type","mkey":"RESOURCETYPE"}
+                 ,{"resourcekey":"menu_code","column":"code"}
+                 ,{"resourcekey":"menu_sort","column":"sort"}
+                 ,{"resourcekey":"menu_urltype","column":"urltype","rcolumn":"urltype","mkey":"RESOURCEURLTYPE"}
+                 ,{"resourcekey":"common_active","column":"active","rcolumn":"active","mkey":"ACTIVETYPE"}
+                  ]
+                 
+     },
+  "getConfigRole":
+     {
+       "table":"role",
+       "querykey":[{"resourcekey":"role_name","id":"name"},{"resourcekey":"common_active","id":"active","ctype":"select"}],
+       "wherekey":{"name":[{"val":"name_zh"},{"val":"name_en"}],"active":[{"val":"active","type":"number"}]},
+       "gridkey":[
+       			  {"resourcekey":"common_id","column":"id","hide":true,"width":50}
+                 ,{"resourcekey":"role_name","column":"name","gsource":true,"tablename":"role"}
+                 ,{"resourcekey":"role_comment","column":"comment"}
+                 ,{"resourcekey":"role_code","column":"code","rcolumn":"code"}
+                 ,{"resourcekey":"role_sort","column":"sort"}
+                 ,{"resourcekey":"common_active","column":"active","rcolumn":"active","mkey":"ACTIVETYPE"}
+                  ]
+                 
+     }
+
+}

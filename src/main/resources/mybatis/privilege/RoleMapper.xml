@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="p.minn.privilege.repository.RoleDao">
+
+	<select id="getTotal" resultType="java.lang.Integer">
+		select count(*) from role where 1=1
+			<if test="condition.active!='unknown'">
+			  and active=${condition.active}
+			</if>
+			<if test="condition.name!='unknown'">
+			   and exists(select * from globalization where tablename='role' and language=#{lang} and name like '${condition.name}%' and tableid=role.id)
+			</if>
+	</select>
+	<select id="query" resultType="java.util.HashMap">
+		select g.id as gid,role.id,g.name,code,active,sort,comment, (select max(name) from v_globalization_dictionary where mkey='ACTIVETYPE' and tablename='dictionary'
+		and val=active and language=#{lang}) as
+		active_name from role inner join globalization g on  tablename='role' and language=#{lang} and tableid=role.id
+		   where 1=1 
+		<if test="condition.active!='unknown'">
+			  and active=${condition.active}
+			</if>
+			<if test="condition.name!='unknown'">
+			   and exists(select * from globalization where tablename='role' and language=#{lang} and name like '${condition.name}%' and tableid=role.id)
+			</if>
+		order by sort
+		limit ${page.startR},${page.endR}
+
+	</select>
+	
+	<select id="checkCode" resultType="java.lang.Integer">
+		select count(*) from role where code=#{code}
+	</select>
+	
+	<select id="getRoleResource" resultType="java.util.HashMap">
+		 select t.id,t.text,t.pid,t.sort
+		 <if test="roleid!='unknown'">
+		 ,case when rr.resource_id is null then 0 else 1 end as
+			selected
+		</if>	
+		<if test="roleid=='unknown'">
+			,0 as selected
+		</if>
+		from( select val as id,name as text,pid,sort from v_globalization_dictionary   
+			 where mkey in('RESOURCEPID','RESOURCECODEID') and tablename in('dictionary','resource') and language=#{lang} ) t
+		<if test="roleid!='unknown'">
+			left join (select * from role_resource where
+			role_id=${roleid} ) rr on t.id=rr.resource_id  
+		</if>
+
+		order by t.sort
+	</select>
+
+	<insert id="saveRoleResource">
+		insert into role_resource(role_id,resource_id) values
+		<foreach collection="roleMenus" item="roleMenu" index="index"
+			open="(" separator="),(" close=")">
+			${roleMenu.roleId},${roleMenu.resourceId}
+		</foreach>
+
+	</insert>
+
+	<insert id="save" parameterType="Role" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into role(name_en,name_zh,comment,code,active,sort,createid,createtime)
+		values(#{nameEn},#{nameZh},#{comment},#{code},${active},${sort},${createid},sysdate())
+	</insert>
+
+
+	<delete id="delete">
+		delete from role where id=${id}
+	</delete>
+
+
+	<delete id="delRoleResource">
+		delete from role_resource where
+		role_id=${roleid}
+	</delete>
+
+	<update id="update" parameterType="Role">
+		update role set
+		name_en=#{nameEn},
+		name_zh=#{nameZh},
+		comment=#{comment},
+		code=#{code},
+		active=${active},
+		sort=${sort},updateid=#{updateid},
+		updatetime=sysdate()
+		where id=${id}
+	</update>
+
+</mapper>

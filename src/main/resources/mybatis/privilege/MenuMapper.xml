@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="p.minn.privilege.repository.MenuDao">
+
+	<select id="getPrivateMenu" resultType="java.util.HashMap">
+		select r.id as id,g.name as text,  pid,r.type as type_v,r.url,'remote' as data from resource r inner join 
+		  (select * from globalization where tablename='resource') g 
+		  on r.id=g.tableid and g.language=#{lang} where type in(-1,0) and
+		r.active=1 and (r.pid in (select id from
+		resource inn where inn.type
+		in(-1,0) and inn.active=1) or r.pid=-1)
+		<if test="user.type!=-1 ">
+			and r.id in ( select distinct rr.resource_id from account_role
+			ur,role_resource rr where ur.role_id=rr.role_id
+			and ur.account_id=${user.id} )
+		</if>
+
+		order by sort
+
+	</select>
+
+	
+
+	<select id="query" resultType="java.util.HashMap">
+		select g.id as gid,resource.id,(select max(name) from  v_globalization_dictionary where tablename='resource' and mkey='RESOURCECODEID' and tableid=resource.id and language=#{lang}) as name,
+		code,type as type_v,urltype as   urltype_v,active as active_v,sort,url,pid as pId,
+		case pid when -1 then   (select max(name) from v_globalization_dictionary where tablename='dictionary' and mkey='RESOURCEPID' and   val=resource.pid and language=#{lang}) 
+		else (select   max(name) from v_globalization_dictionary  where  tablename='resource'  and mkey='RESOURCECODEID' and val=resource.pid and language=#{lang}) end as pNode,
+		(select   max(name ) from   v_globalization_dictionary where tablename='dictionary' and  mkey='RESOURCETYPE' and val=resource.type and language=#{lang}) as   type,
+		(select   max(name ) from v_globalization_dictionary where tablename='dictionary'  and mkey='ACTIVETYPE' and   val=resource.active and language=#{lang}) as   active,
+		(select max(name) from   v_globalization_dictionary where tablename='dictionary'  and mkey='RESOURCEURLTYPE' and val=resource.urltype and language=#{lang}) as   urltype   
+		from resource  inner join globalization g on g.tablename='resource' and g.language=#{lang} and g.tableid=resource.id  where 1=1 
+		<if test="condition.nodeid!='unknown'">
+		  and pid=${condition.nodeid}
+		</if>
+		<if test="condition.name!='unknown'">
+		  and exists(select * from v_globalization_dictionary where tablename='resource' and language=#{lang} and name like '#{condition.name}%' and (tableid=resource.pid or tableid=resource.id))
+		</if>
+		<if test="condition.resource!='unknown'">
+		  and type=${condition.resource}
+		</if>
+		<if test="condition.resourceurltype!='unknown'">
+		  and urltype=${condition.resourceurltype}
+		</if>
+		
+		order by sort
+		limit ${page.startR},${page.endR}
+
+	</select>
+	
+	<select id="getTotal" resultType="java.lang.Integer">
+		select count(*) from resource where 1=1
+		<if test="condition.nodeid!=null and condition.nodeid!=''">
+		  and pid=${condition.nodeid}
+		</if>
+		<if test="condition.name!='unknown'">
+		  and exists(select * from v_globalization_dictionary where tablename='resource' and language=#{lang} and name like '#{condition.name}%' and (tableid=resource.pid or tableid=resource.id))
+		</if>
+		<if test="condition.resource!='unknown'">
+		  and type=${condition.resource}
+		</if>
+		<if test="condition.resourceurltype!='unknown'">
+		  and urltype=${condition.resourceurltype}
+		</if>
+	</select>
+
+	
+	
+	<select id="getResource" resultType="java.util.HashMap">
+		select d.val as id,g.name as text, -2 as pid,-1 as type_v from dictionary d inner join
+		 (select * from globalization where tablename='dictionary') g on d.id=g.tableid 
+		 and g.language=#{lang} and d.mkey='RESOURCEPID' union 
+		 (select r.id as id,g.name as text,  pid,r.type as type_v from resource r inner join 
+		  (select * from globalization where tablename='resource') g 
+		  on r.id=g.tableid and g.language=#{lang} order by r.sort)
+	</select>
+
+	<select id="checkCode" resultType="java.lang.Integer">
+		select count(*) from resource
+		<where>
+			 code=#{code}
+		</where>
+	</select>
+
+	<delete id="delete">
+		delete from resource where id=${id}
+	</delete>
+
+
+	<insert id="save" parameterType="Menu" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO resource (name_en, name_zh,
+		url,pid ,type,sort,code,urltype,active,createid,createtime)
+		VALUES (#{nameEn}, #{nameZh},
+		#{url},${pId},${type},#{sort},#{code},${urlType},${active},${createid},sysdate())
+	</insert>
+
+	<update id="update" parameterType="Menu">
+		update resource set
+		name_en=#{nameEn},name_zh=#{nameZh},url=#{url},pid=${pId},type=${type},sort=${sort},code=#{code},urlType=${urlType},active=${active}
+		,updateid=#{updateid},
+		updatetime=sysdate()
+		where id=${id}
+	</update>
+
+
+
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="p.minn.privilege.repository.PicturePathDao">
+
+
+
+<select id="query" resultType="java.util.HashMap">
+		select picture_path.id,imgname,sourcename,isfirst,imgpath
+		,pictureid,date_format(createtime,'%Y-%m-%d %H:%i:%s') as createtime,(select max(name) from account where id=createid) as createname
+				from picture_path  
+		<where>
+			<if test="condition.pictureid!='unknown'"> pictureid=${condition.pictureid} </if>
+		</where>
+		 order by createtime
+
+	</select>
+	
+
+	<delete id="delete" >
+		delete from picture_path where id=${id}
+	</delete>
+
+
+	<insert id="save" parameterType="PicturePath" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO picture_path (pictureid,pictype,imgname,sourcename,imgpath,isfirst,
+		createid,createtime)
+		VALUES (${pictureid},#{pictype},#{imgname},#{sourcename},#{imgpath},${isfirst},
+		${createid},sysdate())
+	</insert>
+
+	<update id="update" parameterType="PicturePath">
+		update picture_path set updatetime=sysdate(),pictype=#{pictype},updateid=#{updateid},
+		updatetime=sysdate(),
+		imgname=#{imgname},sourcename=#{sourcename}
+		where id=${id}
+	</update>
+	
+	<update id="setFirstPagePic" parameterType="PicturePath">
+		update picture_path set updatetime=sysdate(),isfirst=${isfirst},updateid=#{updateid},
+		updatetime=sysdate()
+		where id=${id}
+	</update>
+
+<select id="findEntityById" resultType="PicturePath">
+		select * from picture_path where id=${id}
+	</select>
+	
+	<select id="getFirstPagePic" resultType="java.util.HashMap">
+		select concat('frontimg/',imgpath) as imgpath,imgname as name from picture_path where isfirst=1;
+	</select>
+	
+	
+	<select id="getFrontTotal" resultType="java.lang.Integer">
+		select count(*)  from picture_path   
+
+	<where>
+		<if test="condition.categoryid!='unknown'"> pictureid in(select id from picture where categoryid=${condition.categoryid}) </if>
+	</where>
+			
+	</select>
+
+<select id="frontQuery" resultType="java.util.HashMap">
+		
+select imgname as name,concat('frontimg/',imgpath) as imgpath from picture_path 
+
+	<where>
+		<if test="condition.categoryid!='unknown'"> pictureid in(select id from picture where categoryid=${condition.categoryid}) </if>
+	</where>
+		 order by createtime desc
+		limit ${page.startR},${page.endR}
+
+	</select>
+</mapper>

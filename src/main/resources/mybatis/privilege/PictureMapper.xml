@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="p.minn.privilege.repository.PictureDao">
+
+
+	<select id="getTotal" resultType="java.lang.Integer">
+		select count(*) from picture  inner join globalization g on g.tablename='picture' and g.tablecolumn='name' and g.language=#{lang} and g.tableid=picture.id
+		<where>
+			<if test="condition.categoryid!='unknown'"> categoryid=${condition.categoryid} </if>
+			<if test="condition.name!='unknown'"> and  g.name like '${condition.name}%' </if>
+		</where>
+	</select>
+
+<select id="query" resultType="java.util.HashMap">
+		select g.id as gid,picture.id,g.name,gcomment.name as comment,gcategory.name as category_name,gcomment.id as gcommentid,
+		active as active_v,sort,categoryid,(select count(*) from picture_path where pictureid=picture.id) as imgcount,date_format(g.createtime,'%Y-%m-%d %H:%i:%s') as createtime,(select max(name) from account where id=g.createid) as createname,
+		(select   max(name ) from v_globalization_dictionary where tablename='dictionary'  and mkey='ACTIVETYPE' and   val=picture.active and language=#{lang}) as   active
+		from picture  inner join globalization g on g.tablename='picture' and g.tablecolumn='name' and g.language=#{lang} and g.tableid=picture.id 
+		inner join globalization gcomment on gcomment.tablename='picture' and gcomment.tablecolumn='comment' and gcomment.language=#{lang} and gcomment.tableid=picture.id 
+		inner join globalization gcategory on gcategory.tablename='category' and gcategory.tablecolumn='name' and gcategory.language=#{lang} and gcategory.tableid=picture.categoryid 
+		<where>
+			<if test="condition.categoryid!='unknown'"> categoryid=${condition.categoryid} </if>
+			<if test="condition.name!='unknown'"> and g.name like '${condition.name}%' </if>
+		</where>
+		
+		 order by sort
+		limit ${page.startR},${page.endR}
+
+	</select>
+	
+	
+
+	<select id="checkName" resultType="java.lang.Integer">
+		select count(*) from picture inner join globalization g on g.tablename='picture' and g.language=#{lang}
+		and g.tablecolumn='name' and g.tableid=picture.id 
+		<where>
+			 name=#{name}
+		</where>
+	</select>
+
+	<delete id="delete" >
+		delete from picture where id=${id}
+	</delete>
+
+
+	<insert id="save" parameterType="Picture" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO picture (categoryid,
+		sort,active,createid,createtime)
+		VALUES (${categoryid},
+		#{sort},${active},${createid},sysdate())
+	</insert>
+
+	<update id="update" parameterType="Picture">
+		update picture set sort=${sort},updatetime=sysdate(),active=${active},updateid=${updateid}
+		where id=${id}
+	</update>
+	
+</mapper>

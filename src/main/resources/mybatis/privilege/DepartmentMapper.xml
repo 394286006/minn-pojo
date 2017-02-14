@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="p.minn.privilege.repository.DepartmentDao">
+
+	<select id="query" resultType="java.util.HashMap">
+		select g.id as gid,department.id,(select max(name) from  globalization where tablename='department' and tablecolumn='name' and tableid=department.id and language=#{lang}) as name,
+		code,active as active_v,pid as pId,
+		case pid when -1 then   (select max(name) from v_globalization_dictionary where tablename='dictionary' and mkey='RESOURCEPID' and   val=department.pid and language=#{lang}) 
+		else (select   max(name) from v_globalization_dictionary  where  tablename='dictionary'  and mkey='RESOURCECODEID' and val=department.pid and language=#{lang}) end as pNode,
+		(select   max(name ) from v_globalization_dictionary where tablename='dictionary'  and mkey='ACTIVETYPE' and   val=department.active and language=#{lang}) as   active
+		from department  inner join globalization g on g.tablename='department' and g.language=#{lang} and g.tableid=department.id  where 1=1 
+		<if test="condition.nodeid!='unknown'">
+		  and pid=${condition.nodeid}
+		</if>
+		<if test="condition.name!='unknown'">
+		  and exists(select * from v_globalization_dictionary where tablename='resource' and language=#{lang} and name like '#{condition.name}%' and (tableid=resource.pid or tableid=resource.id))
+		</if>
+		
+		
+		limit ${page.startR},${page.endR}
+
+	</select>
+	
+	<select id="getTotal" resultType="java.lang.Integer">
+		select count(*) from department where 1=1
+		<if test="condition.nodeid!=null and condition.nodeid!=''">
+		  and pid=${condition.nodeid}
+		</if>
+		<if test="condition.name!='unknown'">
+		  and exists(select * from v_globalization_dictionary where tablename='resource' and language=#{lang} and name like '#{condition.name}%' and (tableid=resource.pid or tableid=resource.id))
+		</if>
+		
+	</select>
+
+	
+	
+	<select id="getResource" resultType="java.util.HashMap">
+		select d.val as id,g.name as text, -2 as pid,0 as selected from dictionary d inner join
+		 (select * from globalization where tablename='dictionary') g on d.id=g.tableid 
+		 and g.language=#{lang} and d.mkey='RESOURCEPID' union 
+		 (select r.id as id,g.name as text,  pid ,0 as selected from department r inner join 
+		  (select * from globalization where tablename='department') g 
+		  on r.id=g.tableid and g.language=#{lang})
+	</select>
+
+	<select id="checkCode" resultType="java.lang.Integer">
+		select count(*) from department
+		<where>
+			 code=#{code}
+		</where>
+	</select>
+
+	<delete id="delete">
+		delete from department where id=${id}
+	</delete>
+
+
+	<insert id="save" parameterType="Department" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO department (pid,code,active,createid,createtime)
+		VALUES (${pId},#{code},${active},${createid},sysdate())
+	</insert>
+
+	<update id="update" parameterType="Department">
+		update department set
+		code=#{code},active=${active}
+		,updateid=#{updateid},
+		updatetime=sysdate()
+		where id=${id}
+	</update>
+
+	<select id="getDepartmentByAcountId" resultType="Department">
+		select department.id,code,active,pid from department   where active=1 
+		and id=(select department_id from account where id=${accountid})
+		
+
+	</select>
+
+</mapper>

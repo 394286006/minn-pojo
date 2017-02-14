@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd      
+	http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+	<!-- author minn -->
+ 
+  <context:property-placeholder ignore-unresolvable="true" location="classpath*:/spring/application.privilege.properties" />
+  <context:component-scan base-package="p.minn.privilege.service,p.minn.aop.log"/>
+  
+  <bean id="privilegedataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
+		<property name="driverClassName" value="${jdbc.privilege.driver}"/> 
+		<property name="url" value="${jdbc.privilege.url}"/> 
+		<property name="username" value="${jdbc.privilege.username}"/> 
+		<property name="password" value="${jdbc.privilege.password}"/> 
+	</bean> 
+
+	<bean id="privilegetransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="privilegedataSource" />
+	</bean>
+	
+    <tx:annotation-driven transaction-manager="privilegetransactionManager"/>
+
+	<!-- define the SqlSessionFactory -->
+	<bean id="privilegeSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="privilegedataSource" />
+		<property name="typeAliasesPackage" value="p.minn.privilege.entity" />
+		<property name="mapperLocations" value="classpath:/mybatis/privilege/*Mapper.xml" />
+		
+	</bean>
+
+
+	<!-- scan for mappers and let them be autowired -->
+	<bean id="privilegemapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="p.minn.privilege.repository" />
+		<property name="sqlSessionFactoryBeanName" value="privilegeSessionFactory"/>
+	</bean>
+	<!--  -->
+    <aop:config>
+       <aop:pointcut expression="execution(public * p.minn..*.*(..))" id="crudlog"/>
+       <aop:advisor advice-ref="logTableAop" pointcut-ref="crudlog"/>
+    </aop:config>
+    
+ 
+</beans>

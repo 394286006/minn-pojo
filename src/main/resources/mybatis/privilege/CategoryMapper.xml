@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="p.minn.privilege.repository.CategoryDao">
+
+
+	<select id="getTotal" resultType="java.lang.Integer">
+		select count(*) from category
+		<where>
+			
+		</where>
+	</select>
+
+
+	<select id="query" resultType="java.util.HashMap">
+		select g.id as gid,category.id,(select max(name) from  v_globalization_dictionary where tablename='resource' and mkey='RESOURCECODEID' and tableid=resource.id and language=#{lang}) as name,
+		code,type as type_v,urltype as   urltype_v,active as active_v,sort,url,pid as pId,
+		case pid when -1 then   (select max(name) from v_globalization_dictionary where tablename='dictionary' and mkey='RESOURCEPID' and   val=resource.pid and language=#{lang}) 
+		else (select   max(name) from v_globalization_dictionary  where  tablename='resource'  and mkey='RESOURCECODEID' and val=resource.pid and language=#{lang}) end as pNode,
+		(select   max(name ) from   v_globalization_dictionary where tablename='dictionary' and  mkey='RESOURCETYPE' and val=resource.type and language=#{lang}) as   type,
+		(select   max(name ) from v_globalization_dictionary where tablename='dictionary'  and mkey='ACTIVETYPE' and   val=resource.active and language=#{lang}) as   active,
+		(select max(name) from   v_globalization_dictionary where tablename='dictionary'  and mkey='RESOURCEURLTYPE' and val=resource.urltype and language=#{lang}) as   urltype   
+		from category  inner join globalization g on g.tablename='resource' and g.language=#{lang} and g.tableid=resource.id  where 1=1 
+		${sql} order by sort
+		limit ${page.startR},${page.endR}
+
+	</select>
+	
+	<select id="getCategory" resultType="java.util.HashMap">
+		select * from (
+		select d.val as id,d.name as text, pid,-2 as sort,1 as active,'' as comment,d.language,-2 as gcommentid,d.tableid as gid from v_globalization_dictionary d where
+		  d.language=#{lang} and d.mkey='RESOURCEPID' union all
+		 (select r.id as id,g.name as text,  pid,r.sort,r.active,gcomment.name as comment,g.language,gcomment.id as gcommentid,g.id as gid from category r inner join 
+		   globalization g on g.tablename='category' and g.tablecolumn='name'
+		  and r.id=g.tableid and g.language=#{lang}  inner join 
+		   globalization gcomment on gcomment.tablename='category' and gcomment.tablecolumn='comment'
+		  and r.id=gcomment.tableid and gcomment.language=#{lang} 
+		  ) ) t
+		  order by t.sort
+	</select>
+
+	<select id="checkName" resultType="java.lang.Integer">
+		select count(*) from category inner join globalization g on g.tablename='category' and g.language=#{lang}
+		and g.tablecolumn='name' and g.tableid=category.id 
+		<where>
+			 name=#{name}
+		</where>
+	</select>
+
+	<delete id="delete">
+		delete from category where id=${id}
+	</delete>
+
+
+	<insert id="save" parameterType="Category" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO category (pid,
+		sort,active,createid,createtime)
+		VALUES (${pid},
+		#{sort},${active},${createid},sysdate())
+	</insert>
+
+	<update id="update" parameterType="Category">
+		update category set sort=${sort},updatetime=sysdate(),active=${active},updateid=${updateid}
+		where id=${id}
+	</update>
+
+
+
+</mapper>

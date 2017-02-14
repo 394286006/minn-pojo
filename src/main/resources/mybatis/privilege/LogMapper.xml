@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="p.minn.privilege.repository.LogDao">
+
+	<select id="getTotal" resultType="java.lang.Integer">
+		select count(ol.id) from operator_log ol ,account u where ol.account_id=u.id
+		<if test="condition.operatorname!='unknown'"> and u.name like '${condition.operatorname}%'</if>
+		<if test="condition.resname!='unknown'"> and ol.res_id like #{condition.resname}</if>
+		<if test="condition.signature!='unknown'"> and ol.signature = '${condition.signature}'</if>
+		<if test="condition.changeid!='unknown'"> and exists(select * from operator_log_detail where
+			name='common_id' and operator_log_id=ol.id and
+			val=${condition.changeid})</if>
+
+	</select>
+
+	<select id="query" resultType="java.util.HashMap">
+		select ol.id,ol.account_ip,date_format(ol.operator_date,'%Y-%c-%d %H:%i:%s') as operator_date,ol.signature,
+		u.name as operatorname,
+		(select name from v_globalization_dictionary where mkey='RESOURCECODE' and language=#{lang} and
+		val=ol.res_id) as resname
+		from operator_log ol ,account u where ol.account_id=u.id
+		<if test="condition.operatorname!='unknown'"> and u.name like '${condition.operatorname}%'</if>
+		<if test="condition.resname!='unknown'"> and ol.res_id = #{condition.resname}</if>
+		<if test="condition.signature!='unknown'"> and ol.signature = '${condition.signature}'</if>
+		<if test="condition.changeid!='unknown'"> and exists(select * from operator_log_detail where
+			name='common_id' and operator_log_id=ol.id and
+			val=${condition.changeid})</if>
+		order by operator_date desc
+		limit ${page.startR},${page.endR}
+	</select>
+
+	<select id="getLogChangeDetail" resultType="java.util.HashMap">
+		select distinct name
+		as k,case ld.mkey when '' then ld.val else (select max(name) from
+		v_globalization_dictionary where mkey=ld.mkey and val=ld.val and language=#{lang}) end as val
+		from operator_log_detail ld where ld.operator_log_id=${id}
+		order by name desc
+
+	</select>
+
+
+	<select id="getSignature" resultType="java.util.HashMap">
+		select distinct 'RESOURCE'
+		as mkey,res_id as id,(select max(name) from v_globalization_dictionary where tablename='resource' and mkey='RESOURCECODE' and language=#{lang} and
+		val=res_id) as text from operator_log
+		union all
+		select distinct 'SIGNATURE' as mkey,signature as id,'' as text
+		from operator_log
+	</select>
+
+	<insert id="insertOperatorLog" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO operator_log (account_id, account_ip,
+		operator_date,res_id,signature)
+		VALUES (#{accountId}, #{accountIp},
+		sysdate(),#{resId},#{signature})
+	</insert>
+
+	<insert id="insertOperatorLogDetail">
+		INSERT INTO
+		operator_log_detail (operator_log_id, name, val,mkey)
+		VALUES
+		(${operatorlogid},#{operatorLogDetail.name},
+		#{operatorLogDetail.val},#{operatorLogDetail.mkey})
+	</insert>
+
+   <delete id="delete">
+		delete from operator_log where id=${id}
+	</delete>
+	
+	 <delete id="deleteDetail">
+		delete from operator_log_detail where operator_log_id=${id}
+	</delete>
+
+</mapper>

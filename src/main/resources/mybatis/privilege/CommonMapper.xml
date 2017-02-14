@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="p.minn.privilege.repository.CommonDao">
+ 
+   <sql id="commonsql">
+       ${sql}
+    </sql>
+    
+   <select id="getTotal" resultType="java.lang.Integer">
+        <include refid="commonsql"/>
+   </select>
+  
+ 	<select id="query" resultType="java.util.HashMap">
+ 	 <include refid="commonsql"/>
+	</select>
+     
+     <sql id="pagesql">
+       limit ${startR},${endR}
+     </sql>
+ 
+ 
+    <select id="getConfigMenuTotal" resultType="java.lang.Integer">
+        select count(*) as c from resource where 1=1
+        <if test="name!='unknown'"> and (name_zh like '${name}%' or name_en like '${name}%')</if>
+    </select>
+    
+   <select id="getConfigMenu" resultType="java.util.HashMap">
+     select resource.id,g.name,url,CAST((case pid when -1 then   (select max(name) from v_globalization_dictionary where tablename='dictionary' and mkey='RESOURCEPID' and   val=resource.pid and language=#{lang}) 
+		else (select   max(name) from v_globalization_dictionary  where  tablename='resource'  and mkey='RESOURCECODEID' and val=resource.pid and language=#{lang}) end) as char) as pNode,
+     CAST((select max(name) from v_globalization_dictionary where mkey='RESOURCETYPE' and tablename='dictionary' and language=#{lang} and val=resource.type ) as char) as typename,code,sort,
+     CAST((select max(name) from v_globalization_dictionary where mkey='RESOURCEURLTYPE' and tablename='dictionary' and language=#{lang} and val=resource.urltype) as char) as urltype,
+     CAST((select max(name) from v_globalization_dictionary where mkey='ACTIVETYPE' and tablename='dictionary' and language=#{lang} and val=resource.active) as char) as active from resource
+      inner join globalization g on g.tablename='resource' and g.language=#{lang} and g.tableid=resource.id where 1=1  
+ 	           
+		<if test="name!='unknown'"> and (name_zh like '${name}%' or name_en like '${name}%')</if>
+		
+		
+ 	   <include refid="pagesql"/>
+   </select>
+ 
+ 
+</mapper>

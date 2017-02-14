@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="p.minn.privilege.repository.MenuDao">
+
+	<select id="getPrivateMenu" resultType="java.util.HashMap">
+		select id,name_${lang} as text,
+		case pid when -1 then '#' else pid end
+		as parent,url,type,urltype from
+		resource where type in(-1,0) and
+		active=1 and (pid in (select id from
+		resource inn where inn.type
+		in(-1,0) and inn.active=1) or pid=-1)
+		<if test="user.type!=-1 ">
+			and id in ( select distinct rr.resource_id from user_role
+			ur,role_resource rr where ur.role_id=rr.role_id
+			and ur.user_id=${user.id} )
+		</if>
+
+		order by sort
+
+	</select>
+
+	<select id="getTotal" resultType="java.lang.Integer">
+		select count(*) from resource
+		<where>
+			pid=${nodeid}
+			<if test="page.qtype=='name'"> and (${page.qtype}_en like '${page.query}%' or
+				${page.qtype}_zh like '${page.query}%')</if>
+		</where>
+	</select>
+	<select id="query" resultType="java.util.HashMap">
+		select id,name_en,name_zh,code,type as type_v,urltype as
+		urltype_v,active as active_v,sort,url,pid as pId,case pid when -1 then
+		(select max(name_${lang}
+		) from dictionary where mkey='RESOURCEPID' and
+		val=pid) else (select
+		max(name_${lang}
+		) from resource r where
+		r.id=resource.pid) end as pNode,(select
+		max(name_${lang}
+		) from
+		dictionary where mkey='RESOURCETYPE' and val=type) as
+		type,(select
+		max(name_${lang}
+		) from dictionary where mkey='ACTIVETYPE' and
+		val=resource.active) as
+		active,(select max(name_${lang}
+		) from
+		dictionary where mkey='RESOURCEURLTYPE' and val=urltype) as
+		urltype
+		from resource
+		<where>
+			pid=${nodeid}
+			<if test="page.qtype=='name'"> and (${page.qtype}_en like '${page.query}%' or
+				${page.qtype}_zh like '${page.query}%')</if>
+		</where>
+		order by sort
+		limit ${page.startR},${page.endR}
+
+	</select>
+
+
+	<select id="getResource" resultType="java.util.HashMap">
+		select val as
+		id,name_${lang}
+		as text,'#' as parent from dictionary where
+		mkey='RESOURCEPID'
+		union all
+		(select id,name_${lang}
+		as text,pid as
+		parent from resource order by sort)
+	</select>
+
+
+	<select id="checkCode" resultType="java.lang.Integer">
+		select count(*) from resource
+		<where>
+			 code=#{code}
+		</where>
+	</select>
+
+	<delete id="delete">
+		delete from resource where id=${id}
+	</delete>
+
+
+	<insert id="save" parameterType="Menu" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO resource (name_en, name_zh,
+		url,pid ,type,sort,code,urltype,active)
+		VALUES (#{nameEn}, #{nameZh},
+		#{url},${pId},${type},#{sort},#{code},${urlType},${active})
+	</insert>
+
+	<update id="update" parameterType="Menu">
+		update resource set
+		name_en=#{nameEn},name_zh=#{nameZh},url=#{url},pid=${pId},type=${type},sort=${sort},code=#{code},urlType=${urlType},active=${active}
+		where id=${id}
+	</update>
+
+
+
+</mapper>

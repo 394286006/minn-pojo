@@ -1,7 +1,29 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>p.minn</groupId>
-  <artifactId>minn-pojo1</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>minn</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>p.minn</groupId>
+		<artifactId>minn-parent</artifactId>
+		<version>0.0.1</version>
+	</parent>
+	<artifactId>minn-pojo</artifactId>
+	<version>0.0.1</version>
+	<dependencies>
+		<dependency>
+			<groupId>p.minn</groupId>
+			<artifactId>minn-common</artifactId>
+			<version>0.0.1-common</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.16</version>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
+	<organization>
+		<name>minn</name>
+		<url>http://fmfl.iteye.com</url>
+	</organization>
+	<name>minn</name>
 </project>

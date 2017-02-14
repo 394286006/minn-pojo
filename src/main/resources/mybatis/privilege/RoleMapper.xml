@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="p.minn.privilege.repository.RoleDao">
+
+	<select id="getTotal" resultType="java.lang.Integer">
+		select count(*) from role
+		<where>
+			<if test="page.qtype=='name'"> (${page.qtype}_en like '${page.query}%' or
+				${page.qtype}_zh like '${page.query}%')</if>
+		</where>
+	</select>
+	<select id="query" resultType="java.util.HashMap">
+		select id,name_en,name_zh,code,active,sort,comment, (select
+		max(name_${lang}
+		) from dictionary where mkey='ACTIVETYPE' and
+		val=active) as
+		active_name from role
+		<where>
+			<if test="page.qtype=='name'"> (${page.qtype}_en like '${page.query}%' or
+				${page.qtype}_zh like '${page.query}%')</if>
+		</where>
+		order by sort
+		limit ${page.startR},${page.endR}
+
+	</select>
+
+	<select id="getRoleResource" resultType="java.util.HashMap">
+		select distinct t.*
+		<if test="roleid!=null and roleid!=''">
+			,case when rr.resource_id is null then 0 else 1 end as
+			flag
+		</if>
+		from (select val as id,name_${lang}
+		as text,'#' as parent, -1 as sort
+		from dictionary where
+		mkey='RESOURCEPID'
+		union all
+		select id,name_${lang}
+		as text,pId as parent,sort from resource ) t
+		<if test="roleid!=null  and roleid!=''">
+			left join (select * from role_resource where
+			role_id=${roleid}
+			) rr on t.id=rr.resource_id
+		</if>
+
+		order by t.sort
+	</select>
+
+	<insert id="saveRoleResource">
+		insert into role_resource(role_id,resource_id) values
+		<foreach collection="roleMenus" item="roleMenu" index="index"
+			open="(" separator="),(" close=")">
+			${roleMenu.roleId},${roleMenu.resourceId}
+		</foreach>
+
+	</insert>
+
+	<insert id="save" parameterType="Role" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into role(name_en,name_zh,comment,code,active,sort)
+		values(#{nameEn},#{nameZh},#{comment},#{code},${active},${sort})
+	</insert>
+
+
+	<delete id="delete">
+		delete from role where id=${id}
+	</delete>
+
+
+	<delete id="delRoleResource">
+		delete from role_resource where
+		role_id=${roleid}
+	</delete>
+
+	<update id="update" parameterType="Role">
+		update role set
+		name_en=#{nameEn},
+		name_zh=#{nameZh},
+		comment=#{comment},
+		code=#{code},
+		active=${active},
+		sort=${sort}
+		where id=${id}
+	</update>
+
+</mapper>

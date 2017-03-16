@@ -78,6 +78,18 @@
 		active=1
 		and name=#{loginName} 
 	</select>
+	
+	<select id="findByRandomKey" resultType="Account">
+		select * from account where
+		active=1
+		and substring_index(randomkey,'_',1)=#{randomKey} 
+	</select>
+	
+	<select id="checkQrCodeByRandomKey" resultType="java.lang.Integer">
+		select count(*) from account where 
+		active=1
+		and substring_index(randomkey,'_',1)=#{randomKey} 
+	</select>
 
 	<insert id="save" parameterType="Account" useGeneratedKeys="true"
 		keyProperty="id">
@@ -97,6 +109,12 @@
 		updateid=${updateid},
 		updatetime=sysdate()
 		WHERE id = #{id}
+	</update>
+	
+	<update id="updateKey" parameterType="Account">
+		UPDATE account SET
+		randomkey = #{randomKey}
+		WHERE name = #{name}
 	</update>
 
 	<insert id="saveAccountRole">

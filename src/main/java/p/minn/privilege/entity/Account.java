@@ -32,6 +32,8 @@ public class Account extends IdEntity{
 	private String salt;
 	
 	private Integer departmentId;
+
+    private String randomKey;
 	
 	public String getName() {
 		return name;
@@ -87,6 +89,14 @@ public class Account extends IdEntity{
 
   public void setDepartmentId(Integer departmentId) {
     this.departmentId = departmentId;
+  }
+
+  public String getRandomKey() {
+    return randomKey;
+  }
+
+  public void setRandomKey(String randomKey) {
+    this.randomKey = randomKey;
   }
 	
 	

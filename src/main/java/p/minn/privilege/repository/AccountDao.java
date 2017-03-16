@@ -43,6 +43,10 @@ public interface AccountDao extends BaseDao<Account,IdEntity>{
 	
 	public List<Map<String, Object>> getAccountRole(@Param("lang") String lang,
 			@Param("condition")Map<String, String> condition);
-
+	public void updateKey(@Param("name") String name,@Param("randomKey") String randomKey);
+	
+	public Account findByRandomKey(@Param("randomKey") String randomKey);
+	
+	public int checkQrCodeByRandomKey(@Param("randomKey") String randomKey);
 
 }

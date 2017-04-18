@@ -79,6 +79,12 @@
 		and name=#{loginName} 
 	</select>
 	
+	<select id="findAccountById" resultType="Account">
+		select * from account where
+		active=1
+		and id=${accountId} 
+	</select>
+	
 	<select id="findByRandomKey" resultType="Account">
 		select * from account where
 		active=1
@@ -139,4 +145,5 @@
 	<select id="getAccountById" resultType="Account">
 		select * from account where id=${account.id}
 	</select>
+	
 </mapper>

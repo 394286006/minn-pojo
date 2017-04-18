@@ -26,7 +26,7 @@
   <select id="query" resultType="java.util.HashMap">
 		select d.id,d.mkey as pkey,d.val as value,d.sort,(select max(name) from account where id=d.createid) as createname,
 		date_format(d.createtime,'%Y-%m-%d %H:%i:%s') as createtime,g.name,g.id as gid,date_format(d.updatetime,'%Y-%m-%d %H:%i:%s') as updatetime,
-		(select max(name) from account where id=d.updateid) as updatename  from dictionary d inner join globalization g on g.tablename='dictionary' and g.language=#{lang} and g.tableid=d.id    
+		(select max(name) from account where id=d.updateid) as updatename,var1,var2,var3,var4,var5  from dictionary d inner join globalization g on g.tablename='dictionary' and g.language=#{lang} and g.tableid=d.id    
 		<where>
 		   <if test="condition.pkey!='unknown'">
 		  		d.mkey=#{condition.pkey}
@@ -41,6 +41,11 @@
 		val=#{val},
 		sort=#{sort},
 		updateid=#{updateid},
+		var1=#{var1},
+		var2=#{var2},
+		var3=#{var3},
+		var4=#{var4},
+		var5=#{var5},
 		updatetime=sysdate()
 		WHERE id = ${id}
 	</update>
@@ -52,9 +57,9 @@
   <insert id="save" parameterType="Dictionary" useGeneratedKeys="true"
 		keyProperty="id">
 		INSERT INTO dictionary (mkey, val,
-		sort,createid,createtime,updateid,updatetime)
+		sort,createid,createtime,updateid,updatetime,var1,var2,var3,var4,var5)
 		VALUES ( #{mkey}, #{val},
-		#{sort},#{createid},sysdate(),#{createid},sysdate())
+		#{sort},#{createid},sysdate(),#{createid},sysdate(),#{var1},{var2},#{var3},#{var4},#{var5})
 	</insert>
 	
   	<select id="checkType" resultType="java.lang.Integer">

@@ -49,4 +49,6 @@ public interface AccountDao extends BaseDao<Account,IdEntity>{
 	
 	public int checkQrCodeByRandomKey(@Param("randomKey") String randomKey);
 
+    public Account findAccountById(@Param("accountId")Integer accountId);
+
 }

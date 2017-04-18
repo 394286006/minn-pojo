@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="p.minn.privilege.repository.AccountThirdPartDao">
+	<select id="getTotal" resultType="java.lang.Integer">
+		select count(*) from account_thirdpart where 1=1
+		<if test="condition.accountId!='unknown'">
+		  and account_id = '${condition.accountId}%'
+		</if>
+	</select>
+	<select id="query" resultType="java.util.HashMap">
+		select id,name,secretkey,type,active,mark,(select max(name) from
+		v_globalization_dictionary where mkey='ACTIVETYPE' and language=#{lang} and val=active) as active_name,(select max(name) from
+		v_globalization_dictionary where mkey='ACCOUNTTHIRDPATH' and language=#{lang} and val=type) as type_name from account_thirdpart where 1=1
+		
+		<if test="condition.accountId!='unknown'">
+		  and account_id=${condition.accountId}
+		</if>
+		
+	</select>
+    <select id="findByName" resultType="AccountThirdPart">
+		select * from account_thirdpart where
+		active=1
+		and name=#{name} 
+	</select>
+	
+	<insert id="save" parameterType="AccountThirdPart" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO account_thirdpart (account_id,name,type,secretkey,mark,active,createid,createtime)
+		VALUES
+		(#{accountId},#{name},#{type},#{secretkey},#{mark},#{active},#{createid},sysdate())
+	</insert>
+
+	<update id="update" parameterType="AccountThirdPart">
+		UPDATE account_thirdpart SET
+		name = #{name},
+		account_id=#{accountId},
+		type=#{type},
+		secretkey=#{secretkey},
+		active=#{active},
+		mark=#{mark},
+		updateid=${updateid},
+		updatetime=sysdate()
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from account_thirdpart where id=${id}
+	</delete>
+
+
+  <select id="getThirdParts" resultType="java.util.HashMap">
+    select d.name,d.val,ifnull(a.account_id,-1) as status,a.id,d.var1,d.var2,d.var3,d.var4,d.var5 from (select * from  v_globalization_dictionary where mkey='ACCOUNTTHIRDPATH' and language=#{lang}) as d left join (select * from account_thirdpart where account_id=${accountId} ) as a on d.val=a.type where d.var2='show' order by d.sort 
+  </select>
+  
+ <select id="getLoginThirdParts" resultType="java.util.HashMap">
+   select d.name,d.var1 from v_globalization_dictionary d where mkey='ACCOUNTTHIRDPATH' and d.language=#{lang} and d.var2='show'   order by d.sort
+  </select>
+</mapper>

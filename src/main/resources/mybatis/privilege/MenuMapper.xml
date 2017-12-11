@@ -36,7 +36,7 @@
 		  and pid=${condition.nodeid}
 		</if>
 		<if test="condition.name!='unknown'">
-		  and exists(select * from v_globalization_dictionary where tablename='resource' and language=#{lang} and name like '#{condition.name}%' and (tableid=resource.pid or tableid=resource.id))
+		  and exists(select * from v_globalization_dictionary where tablename='resource' and language=#{lang} and name like concat(#{condition.name},'%') and (tableid=resource.pid or tableid=resource.id))
 		</if>
 		<if test="condition.resource!='unknown'">
 		  and type=${condition.resource}
@@ -56,7 +56,7 @@
 		  and pid=${condition.nodeid}
 		</if>
 		<if test="condition.name!='unknown'">
-		  and exists(select * from v_globalization_dictionary where tablename='resource' and language=#{lang} and name like '#{condition.name}%' and (tableid=resource.pid or tableid=resource.id))
+		  and exists(select * from v_globalization_dictionary where tablename='resource' and language=#{lang} and name like concat(#{condition.name},'%') and (tableid=resource.pid or tableid=resource.id))
 		</if>
 		<if test="condition.resource!='unknown'">
 		  and type=${condition.resource}

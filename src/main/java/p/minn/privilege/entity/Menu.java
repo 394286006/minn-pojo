@@ -14,12 +14,6 @@ import p.minn.common.annotation.LogAnnotation;
 @LogAnnotation
 public class Menu extends IdEntity{
 	
-	@LogAnnotation(resourceKey="menu_name_zh")
-	private String nameZh;
-	
-	@LogAnnotation(resourceKey="menu_name_en")
-	private String nameEn;
-	
 	@LogAnnotation(resourceKey="menu_url")
 	private String url;
 	
@@ -40,22 +34,6 @@ public class Menu extends IdEntity{
 	
 	@LogAnnotation(resourceKey="common_active",mkey="ACTIVETYPE")
 	private Integer active;
-	
-	public String getNameZh() {
-		return nameZh;
-	}
-
-	public void setNameZh(String nameZh) {
-		this.nameZh = nameZh;
-	}
-
-	public String getNameEn() {
-		return nameEn;
-	}
-
-	public void setNameEn(String nameEn) {
-		this.nameEn = nameEn;
-	}
 
 	public String getUrl() {
 		return url;

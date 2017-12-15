@@ -91,15 +91,15 @@
 
 	<insert id="save" parameterType="Menu" useGeneratedKeys="true"
 		keyProperty="id">
-		INSERT INTO resource (name_en, name_zh,
+		INSERT INTO resource (
 		url,pid ,type,sort,code,urltype,active,createid,createtime)
-		VALUES (#{nameEn}, #{nameZh},
+		VALUES (
 		#{url},${pId},${type},#{sort},#{code},${urlType},${active},${createid},sysdate())
 	</insert>
 
 	<update id="update" parameterType="Menu">
 		update resource set
-		name_en=#{nameEn},name_zh=#{nameZh},url=#{url},pid=${pId},type=${type},sort=${sort},code=#{code},urlType=${urlType},active=${active}
+		url=#{url},pid=${pId},type=${type},sort=${sort},code=#{code},urlType=${urlType},active=${active}
 		,updateid=#{updateid},
 		updatetime=sysdate()
 		where id=${id}

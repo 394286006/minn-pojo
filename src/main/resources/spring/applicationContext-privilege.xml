@@ -17,7 +17,7 @@
   <context:property-placeholder ignore-unresolvable="true" location="classpath*:/spring/application.privilege.properties" />
   <context:component-scan base-package="p.minn.privilege.service,p.minn.aop.log"/>
   
-  <bean id="privilegedataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
+  <bean id="privilegedataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" primary="true"> 
 		<property name="driverClassName" value="${jdbc.privilege.driver}"/> 
 		<property name="url" value="${jdbc.privilege.url}"/> 
 		<property name="username" value="${jdbc.privilege.username}"/> 

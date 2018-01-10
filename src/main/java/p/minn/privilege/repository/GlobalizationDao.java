@@ -15,7 +15,7 @@ import p.minn.privilege.entity.IdEntity;
 public interface GlobalizationDao extends BaseDao<Globalization,IdEntity>{
 
 	@LogAnnotation(resourceKey="common_del")
-	public void deleteByTableId(@Param("tableid") Integer tableid,@Param("tablename") String tablename);
+	public void deleteByTableId(@Param("tableid") String tableid,@Param("tablename") String tablename);
 	
 	//@LogAnnotation(resourceKey="common_del")
     public void updateByTable(Globalization globalization);

@@ -1,6 +1,7 @@
 package p.minn.privilege.entity;
 
 import p.minn.common.annotation.LogAnnotation;
+import p.minn.common.entity.IdEntity;
 
 
 

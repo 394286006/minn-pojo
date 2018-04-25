@@ -15,7 +15,7 @@
 	<!-- author minn -->
  
   <context:property-placeholder ignore-unresolvable="true" location="classpath*:/spring/application.privilege.properties" />
-  <context:component-scan base-package="p.minn.privilege.service,p.minn.aop.log"/>
+  <context:component-scan base-package="p.minn.privilege.service,p.minn.aop.log,p.minn.common.service,p.minn.demo.service,p.minn.security.service"/>
   
   <bean id="privilegedataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" primary="true"> 
 		<property name="driverClassName" value="${jdbc.privilege.driver}"/> 
@@ -33,22 +33,27 @@
 	<!-- define the SqlSessionFactory -->
 	<bean id="privilegeSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="privilegedataSource" />
-		<property name="typeAliasesPackage" value="p.minn.privilege.entity" />
-		<property name="mapperLocations" value="classpath:/mybatis/privilege/*Mapper.xml" />
-		
+		<property name="typeAliasesPackage" value="p.minn.privilege.entity,p.minn.common.entity,p.minn.auth.entity" />
+		<property name="mapperLocations" >
+		   <list>
+		       <value>classpath:/mybatis/privilege/*Mapper.xml</value>
+		       <value>classpath:/mybatis/common/*Mapper.xml</value>
+		       <value>classpath:/mybatis/auth/*Mapper.xml</value>
+		   </list>
+		</property>
 	</bean>
 
 
 	<!-- scan for mappers and let them be autowired -->
 	<bean id="privilegemapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="p.minn.privilege.repository" />
+		<property name="basePackage" value="p.minn.privilege.repository,p.minn.common.repository,,p.minn.auth.repository" />
 		<property name="sqlSessionFactoryBeanName" value="privilegeSessionFactory"/>
 	</bean>
-	<!--  -->
+	<!--  
     <aop:config>
        <aop:pointcut expression="execution(public * p.minn..*.*(..))" id="crudlog"/>
        <aop:advisor advice-ref="logTableAop" pointcut-ref="crudlog"/>
     </aop:config>
-    
+    -->
  
 </beans>

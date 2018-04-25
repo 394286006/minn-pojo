@@ -5,8 +5,9 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import p.minn.common.baseDao.BaseDao;
+import p.minn.common.entity.IdEntity;
 import p.minn.common.utils.Page;
-import p.minn.privilege.entity.IdEntity;
 import p.minn.privilege.entity.PicturePath;
 
 /**

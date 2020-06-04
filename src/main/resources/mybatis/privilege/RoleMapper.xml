@@ -61,7 +61,7 @@
 
 	</insert>
 
-	<insert id="save" parameterType="Role" useGeneratedKeys="true"
+	<insert id="save" parameterType="p.minn.auth.entity.Role" useGeneratedKeys="true"
 		keyProperty="id">
 		insert into role(name_en,name_zh,comment,code,active,sort,createid,createtime)
 		values(#{nameEn},#{nameZh},#{comment},#{code},${active},${sort},${createid},sysdate())
@@ -78,7 +78,7 @@
 		role_id=${roleid}
 	</delete>
 
-	<update id="update" parameterType="Role">
+	<update id="update" parameterType="p.minn.auth.entity.Role">
 		update role set
 		name_en=#{nameEn},
 		name_zh=#{nameZh},

@@ -67,25 +67,25 @@
 	</select>
 
 
-	<select id="checkAccount" resultType="Account">
+	<select id="checkAccount" resultType="p.minn.auth.entity.Account">
 		select * from account where
 		active=1
 		and name=#{name} and pwd=#{pwd}
 	</select>
 	
-	<select id="findByLoginName" resultType="Account">
+	<select id="findByLoginName" resultType="p.minn.auth.entity.Account">
 		select * from account where
 		active=1
 		and name=#{loginName} 
 	</select>
 	
-	<select id="findAccountById" resultType="Account">
+	<select id="findAccountById" resultType="p.minn.auth.entity.Account">
 		select * from account where
 		active=1
 		and id=${accountId} 
 	</select>
 	
-	<select id="findByRandomKey" resultType="Account">
+	<select id="findByRandomKey" resultType="p.minn.auth.entity.Account">
 		select * from account where
 		active=1
 		and substring_index(randomkey,'_',1)=#{randomKey} 
@@ -97,14 +97,14 @@
 		and substring_index(randomkey,'_',1)=#{randomKey} 
 	</select>
 
-	<insert id="save" parameterType="Account" useGeneratedKeys="true"
+	<insert id="save" parameterType="p.minn.auth.entity.Account" useGeneratedKeys="true"
 		keyProperty="id">
 		INSERT INTO account (name, pwd, type,logintype,active,department_id,createid,createtime)
 		VALUES
 		(#{name}, #{pwd}, #{type},#{loginType},#{active},#{departmentId},${createid},sysdate())
 	</insert>
 
-	<update id="update" parameterType="Account">
+	<update id="update" parameterType="p.minn.auth.entity.Account">
 		UPDATE account SET
 		pwd = #{pwd},
 		name=#{name},
@@ -117,7 +117,7 @@
 		WHERE id = #{id}
 	</update>
 	
-	<update id="updateKey" parameterType="Account">
+	<update id="updateKey" parameterType="p.minn.auth.entity.Account">
 		UPDATE account SET
 		randomkey = #{randomKey}
 		WHERE name = #{name}
@@ -142,7 +142,7 @@
 		delete from account_role where
 		account_id=${accountid}
 	</delete>
-	<select id="getAccountById" resultType="Account">
+	<select id="getAccountById" resultType="p.minn.auth.entity.Account">
 		select * from account where id=${account.id}
 	</select>
 	

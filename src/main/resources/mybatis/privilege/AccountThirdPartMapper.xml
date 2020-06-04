@@ -19,20 +19,20 @@
 		</if>
 		
 	</select>
-    <select id="findByName" resultType="AccountThirdPart">
+    <select id="findByName" resultType="p.minn.auth.entity.AccountThirdPart">
 		select * from account_thirdpart where
 		active=1
 		and name=#{name} 
 	</select>
 	
-	<insert id="save" parameterType="AccountThirdPart" useGeneratedKeys="true"
+	<insert id="save" parameterType="p.minn.auth.entity.AccountThirdPart" useGeneratedKeys="true"
 		keyProperty="id">
 		INSERT INTO account_thirdpart (account_id,name,type,secretkey,mark,active,createid,createtime)
 		VALUES
 		(#{accountId},#{name},#{type},#{secretkey},#{mark},#{active},#{createid},sysdate())
 	</insert>
 
-	<update id="update" parameterType="AccountThirdPart">
+	<update id="update" parameterType="p.minn.auth.entity.AccountThirdPart">
 		UPDATE account_thirdpart SET
 		name = #{name},
 		account_id=#{accountId},

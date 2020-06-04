@@ -23,7 +23,7 @@
 	</delete>
 
 
-	<insert id="save" parameterType="PicturePath" useGeneratedKeys="true"
+	<insert id="save" parameterType="p.minn.privilege.entity.PicturePath" useGeneratedKeys="true"
 		keyProperty="id">
 		INSERT INTO picture_path (pictureid,pictype,imgname,sourcename,imgpath,isfirst,
 		createid,createtime)
@@ -31,20 +31,20 @@
 		${createid},sysdate())
 	</insert>
 
-	<update id="update" parameterType="PicturePath">
+	<update id="update" parameterType="p.minn.privilege.entity.PicturePath">
 		update picture_path set updatetime=sysdate(),pictype=#{pictype},updateid=#{updateid},
 		updatetime=sysdate(),
 		imgname=#{imgname},sourcename=#{sourcename}
 		where id=${id}
 	</update>
 	
-	<update id="setFirstPagePic" parameterType="PicturePath">
+	<update id="setFirstPagePic" parameterType="p.minn.privilege.entity.PicturePath">
 		update picture_path set updatetime=sysdate(),isfirst=${isfirst},updateid=#{updateid},
 		updatetime=sysdate()
 		where id=${id}
 	</update>
 
-<select id="findEntityById" resultType="PicturePath">
+<select id="findEntityById" resultType="p.minn.privilege.entity.PicturePath">
 		select * from picture_path where id=${id}
 	</select>
 	

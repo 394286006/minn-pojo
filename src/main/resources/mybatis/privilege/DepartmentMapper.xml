@@ -57,13 +57,13 @@
 	</delete>
 
 
-	<insert id="save" parameterType="Department" useGeneratedKeys="true"
+	<insert id="save" parameterType="p.minn.auth.entity.Department" useGeneratedKeys="true"
 		keyProperty="id">
 		INSERT INTO department (pid,code,active,createid,createtime)
 		VALUES (${pId},#{code},${active},${createid},sysdate())
 	</insert>
 
-	<update id="update" parameterType="Department">
+	<update id="update" parameterType="p.minn.auth.entity.Department">
 		update department set
 		code=#{code},active=${active}
 		,updateid=#{updateid},
@@ -71,7 +71,7 @@
 		where id=${id}
 	</update>
 
-	<select id="getDepartmentByAcountId" resultType="Department">
+	<select id="getDepartmentByAcountId" resultType="p.minn.auth.entity.Department">
 		select department.id,code,active,pid from department   where active=1 
 		and id=(select department_id from account where id=${accountid})
 		

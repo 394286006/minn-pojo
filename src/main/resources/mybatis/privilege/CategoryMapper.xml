@@ -53,7 +53,7 @@
 	</delete>
 
 
-	<insert id="save" parameterType="Category" useGeneratedKeys="true"
+	<insert id="save" parameterType="p.minn.privilege.entity.Category" useGeneratedKeys="true"
 		keyProperty="id">
 		INSERT INTO category (pid,
 		sort,active,createid,createtime)
@@ -61,7 +61,7 @@
 		#{sort},${active},${createid},sysdate())
 	</insert>
 
-	<update id="update" parameterType="Category">
+	<update id="update" parameterType="p.minn.privilege.entity.Category">
 		update category set sort=${sort},updatetime=sysdate(),active=${active},updateid=${updateid}
 		where id=${id}
 	</update>

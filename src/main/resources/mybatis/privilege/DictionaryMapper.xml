@@ -36,7 +36,7 @@
 		limit ${page.startR},${page.rp}
 	</select>
   
-  <update id="update" parameterType="Dictionary">
+  <update id="update" parameterType="p.minn.privilege.entity.Dictionary">
 		UPDATE dictionary SET
 		val=#{val},
 		sort=#{sort},
@@ -54,7 +54,7 @@
 		delete from dictionary where id=${id} 
 	</delete>
   
-  <insert id="save" parameterType="Dictionary" useGeneratedKeys="true"
+  <insert id="save" parameterType="p.minn.privilege.entity.Dictionary" useGeneratedKeys="true"
 		keyProperty="id">
 		INSERT INTO dictionary (mkey, val,
 		sort,createid,createtime,updateid,updatetime,var1,var2,var3,var4,var5)

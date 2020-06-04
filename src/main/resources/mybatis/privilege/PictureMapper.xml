@@ -45,7 +45,7 @@
 	</delete>
 
 
-	<insert id="save" parameterType="Picture" useGeneratedKeys="true"
+	<insert id="save" parameterType="p.minn.privilege.entity.Picture" useGeneratedKeys="true"
 		keyProperty="id">
 		INSERT INTO picture (categoryid,
 		sort,active,createid,createtime)
@@ -53,7 +53,7 @@
 		#{sort},${active},${createid},sysdate())
 	</insert>
 
-	<update id="update" parameterType="Picture">
+	<update id="update" parameterType="p.minn.privilege.entity.Picture">
 		update picture set sort=${sort},updatetime=sysdate(),active=${active},updateid=${updateid}
 		where id=${id}
 	</update>

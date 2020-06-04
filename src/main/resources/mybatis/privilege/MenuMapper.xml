@@ -89,7 +89,7 @@
 	</delete>
 
 
-	<insert id="save" parameterType="Menu" useGeneratedKeys="true"
+	<insert id="save" parameterType="p.minn.privilege.entity.Menu" useGeneratedKeys="true"
 		keyProperty="id">
 		INSERT INTO resource (
 		url,pid ,type,sort,code,urltype,active,createid,createtime)
@@ -97,7 +97,7 @@
 		#{url},${pId},${type},#{sort},#{code},${urlType},${active},${createid},sysdate())
 	</insert>
 
-	<update id="update" parameterType="Menu">
+	<update id="update" parameterType="p.minn.privilege.entity.Menu">
 		update resource set
 		url=#{url},pid=${pId},type=${type},sort=${sort},code=#{code},urlType=${urlType},active=${active}
 		,updateid=#{updateid},
